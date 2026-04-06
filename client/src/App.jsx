@@ -14,6 +14,8 @@ import ManagerLayout from './components/ManagerLayout';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Homepage from './pages/Homepage';
+import OurStory from './pages/OurStory';
+import Ingredients from './pages/Ingredients';
 import Reservations from './pages/Reservations';
 import Menu from './pages/Menu';
 import QRMenu from './pages/QRMenu';
@@ -52,6 +54,8 @@ const router = createBrowserRouter([
       { path: '/login', element: <Login /> },
       { path: '/signup', element: <Signup /> },
       { path: '/', element: <Homepage /> },
+      { path: '/story', element: <OurStory /> },
+      { path: '/ingredients', element: <Ingredients /> },
       { path: '/reservations', element: <Reservations /> },
       { path: '/menu', element: <Menu /> },
       { path: '/qr-menu/:tableId', element: <QRMenu /> },

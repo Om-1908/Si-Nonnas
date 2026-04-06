@@ -7,13 +7,6 @@ import { showToast } from '../components/Toast';
 import api from '../lib/axios';
 import { mockMenuItems } from '../lib/mockData';
 
-const quickActions = [
-  { icon: 'qr_code_2', title: 'Scan QR & Order', desc: 'Skip the queue, order from your table.', to: '/qr-menu/demo' },
-  { icon: 'local_shipping', title: 'Track my order', desc: 'Real-time updates from oven to door.', to: '/profile' },
-  { icon: 'event_seat', title: 'Make a reservation', desc: 'Secure your spot at our hearth.', to: '/reservations' },
-  { icon: 'restaurant_menu', title: 'View full menu', desc: 'Explore our seasonal Italian delights.', to: '/menu' },
-];
-
 export default function Homepage() {
   const { addItem } = useCartStore();
   const [signatures, setSignatures] = useState([]);
@@ -34,25 +27,43 @@ export default function Homepage() {
       <Navbar />
 
       {/* ── Hero — Full-width pizza image ── */}
-      <section className="relative h-[480px] overflow-hidden">
+      <section className="relative h-[520px] overflow-hidden">
         <img
           src="https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=1600&q=80"
           alt="The Original Sourdough Pizza"
           className="w-full h-full object-cover object-center"
         />
         {/* Dark gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(26,10,2,0.75)] via-[rgba(26,10,2,0.5)] to-[rgba(26,10,2,0.3)]" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(26,10,2,0.8)] via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[rgba(26,10,2,0.80)] via-[rgba(26,10,2,0.55)] to-[rgba(26,10,2,0.25)]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[rgba(26,10,2,0.85)] via-transparent to-transparent" />
 
         <div className="absolute inset-0 flex flex-col justify-center px-12 md:px-20">
-          <p className="text-[#FF9E18] text-xs uppercase tracking-[0.2em] font-medium mb-3">Si Nonna's</p>
+          {/* Fix 7: Official logo in hero */}
+          <div className="mb-5">
+            <img
+              src="https://sinonnas.com/wp-content/uploads/2022/06/Logo-3.png"
+              alt="Si Nonna's"
+              style={{ maxWidth: '280px', width: 'auto' }}
+              className="object-contain brightness-0 invert"
+              onError={e => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            <span
+              className="hidden font-heading text-3xl font-bold text-[#ffc589] italic"
+              style={{ fontFamily: "'Noto Serif',Georgia,serif" }}
+            >
+              Si Nonna's
+            </span>
+          </div>
           <h1 className="font-heading text-5xl md:text-6xl font-bold text-[#ffdbc7] leading-tight mb-4 italic">
             The Original<br />Sourdough Pizza
           </h1>
           <p className="text-[#dac2ae] text-base mb-8 max-w-md leading-relaxed">
             Proved for 24 hours. Blast-cooked at 400°C for 90 seconds. Heritage craft, modern soul.
           </p>
-          <div className="flex gap-4">
+          <div className="flex gap-4 flex-wrap">
             <Link to="/menu" className="bg-[#FF9E18] text-[#2c1700] font-bold uppercase tracking-[0.08em] px-8 py-3 rounded-[2px] hover:bg-[#ffb84d] transition-colors text-sm">
               Order Now
             </Link>
@@ -63,18 +74,7 @@ export default function Homepage() {
         </div>
       </section>
 
-      {/* ── Quick Action Cards ── */}
-      <section className="bg-[#200f04] py-10 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4">
-          {quickActions.map(a => (
-            <Link key={a.title} to={a.to} className="bg-[#2e1b0e] rounded-[4px] p-5 group hover:bg-[#3a2518] transition-colors">
-              <span className="material-symbols-outlined text-[#FF9E18] text-2xl mb-3 block group-hover:scale-110 transition-transform">{a.icon}</span>
-              <h3 className="font-heading text-[#ffdbc7] font-semibold text-sm mb-1">{a.title}</h3>
-              <p className="text-[#a0815a] text-xs leading-relaxed">{a.desc}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* Fix 6: Quick Action Cards REMOVED entirely */}
 
       {/* ── Our Signatures ── */}
       <section className="py-14 px-6 bg-[#1a0a02]">
@@ -138,20 +138,28 @@ export default function Homepage() {
             <p className="text-[#a0815a] text-sm leading-relaxed mb-6">
               We use a heritage sourdough starter passed down through three generations. Every ball of dough is hand-stretched and topped with the finest ingredients sourced directly from Italian farmers we know by name.
             </p>
-            <Link to="/menu" className="inline-flex items-center gap-2 text-[#FF9E18] text-sm font-medium hover:underline">
+            <Link to="/story" className="inline-flex items-center gap-2 text-[#FF9E18] text-sm font-medium hover:underline">
               Read our story <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </Link>
           </div>
-          <div className="relative h-72 rounded-[4px] overflow-hidden">
+
+          {/* Fix 5: Illustration capped at 380×340, object-contain */}
+          <div className="flex items-center justify-center rounded-[4px] overflow-hidden bg-[#2e1b0e] p-4">
             <img
               src="https://sinonnas.com/wp-content/uploads/2022/06/Illustration.svg"
-              alt="Wood-fired pizza oven"
-              className="w-full h-full object-cover"
+              alt="Naples pizza illustration"
+              style={{ maxWidth: '380px', maxHeight: '340px', width: '100%', objectFit: 'contain' }}
+              onError={e => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
             />
-            <div className="absolute bottom-4 left-4 bg-[rgba(46,27,14,0.85)] rounded-[2px] px-3 py-2 backdrop-blur-sm">
-              <p className="text-[#a0815a] text-[9px] uppercase tracking-wider">Preserving the soul of Neapolitan sourdough</p>
-              <p className="text-[#FF9E18] text-xs font-semibold">Heritage since 1984</p>
-            </div>
+            {/* Fallback photo */}
+            <img
+              src="https://images.unsplash.com/photo-1555817129-2c96d1c2c85e?w=800&q=80"
+              alt="Wood-fired pizza oven"
+              className="hidden w-full h-72 object-cover"
+            />
           </div>
         </div>
       </section>

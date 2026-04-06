@@ -18,25 +18,35 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo — Si Nonna's brand wordmark */}
-          <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
-            <div className="flex flex-col leading-none">
-              <span className="font-heading text-2xl font-bold text-[#ffc589] italic tracking-tight group-hover:text-[#FF9E18] transition-colors" style={{fontFamily: "'Noto Serif', Georgia, serif"}}>
-                Si Nonna's
-              </span>
-              <span className="text-[#a0815a] text-[9px] uppercase tracking-[0.15em] -mt-0.5">The Original Sourdough Pizza</span>
-            </div>
+          {/* Logo — Official Si Nonna's PNG */}
+          <Link to="/" className="flex items-center flex-shrink-0 group">
+            <img
+              src="https://sinonnas.com/wp-content/uploads/2022/06/Logo-3.png"
+              alt="Si Nonna's"
+              style={{ height: '36px', width: 'auto' }}
+              className="object-contain brightness-0 invert opacity-90 group-hover:opacity-100 transition-opacity"
+              onError={e => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            {/* Fallback wordmark */}
+            <span
+              className="hidden font-heading text-xl font-bold text-[#ffc589] italic tracking-tight"
+              style={{ fontFamily: "'Noto Serif',Georgia,serif" }}
+            >
+              Si Nonna's
+            </span>
           </Link>
 
-          {/* Nav Links */}
+          {/* Nav Links — no Contact */}
           <div className="hidden md:flex items-center gap-8">
             {[
               { label: 'Home', to: '/' },
-              { label: 'Our Story', to: '/#story' },
-              { label: 'Ingredients', to: '/#ingredients' },
+              { label: 'Our Story', to: '/story' },
+              { label: 'Ingredients', to: '/ingredients' },
               { label: 'Menu', to: '/menu' },
               { label: 'Reserve a Table', to: '/reservations' },
-              { label: 'Contact', to: '/#contact' },
             ].map((l) => (
               <Link key={l.to} to={l.to}
                 className="text-[#dac2ae] hover:text-[#ffdbc7] text-xs font-medium uppercase tracking-[0.08em] transition-colors">
@@ -48,7 +58,9 @@ export default function Navbar() {
           {/* Right Actions */}
           <div className="flex items-center gap-4">
             {/* Cart */}
-            <button onClick={openDrawer} className="relative p-1.5 text-[#a0815a] hover:text-[#ffdbc7] transition-colors" aria-label="Open cart">
+            <button onClick={openDrawer}
+              className="relative p-1.5 text-[#a0815a] hover:text-[#ffdbc7] transition-colors"
+              aria-label="Open cart">
               <span className="material-symbols-outlined text-xl">shopping_bag</span>
               {totalItems > 0 && (
                 <span className="absolute -top-0.5 -right-0.5 bg-[#FF9E18] text-[#2c1700] text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
