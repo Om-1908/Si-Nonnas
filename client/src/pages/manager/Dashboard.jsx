@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../../lib/axios';
-import { mockAnalyticsSummary, mockOrders, mockReviews } from '../../lib/mockData';
+import { mockAnalyticsSummary, mockOrders, mockReviews, mockMenuItems } from '../../lib/mockData';
 import { showToast } from '../../components/Toast';
 
 export default function Dashboard() {
@@ -9,10 +9,16 @@ export default function Dashboard() {
   const [reviews, setReviews] = useState([]);
   const [replyId, setReplyId] = useState(null);
   const [replyText, setReplyText] = useState('');
+  // stock state
+  const [menuItems, setMenuItems] = useState([]);
   const now = new Date();
 
   const hour = now.getHours();
   const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+
+  const fetchMenuItems = () => {
+    api.get('/menu').then(r => setMenuItems(r.data || [])).catch(() => setMenuItems(mockMenuItems));
+  };
 
   useEffect(() => {
     api.get('/analytics/summary').then(r => setSummary(r.data)).catch(() => {});
@@ -22,6 +28,7 @@ export default function Dashboard() {
     api.get('/reviews?limit=3')
       .then(r => setReviews(r.data))
       .catch(() => setReviews(mockReviews));
+    fetchMenuItems();
   }, []);
 
   const kpis = [
@@ -68,11 +75,23 @@ export default function Dashboard() {
     } catch { showToast('Failed', 'error'); }
   };
 
-  const lowStockItems = [
-    { name: 'Buffalo Mozzarella', stock: '2kg', threshold: '5kg', pct: 40 },
-    { name: 'San Marzano Tomatoes', stock: '5 Cans', threshold: '12 Cans', pct: 41 },
-    { name: 'Artisan Flour (Type 00)', stock: '4kg', threshold: '10kg', pct: 40 },
-  ];
+  const outOfStockItems = menuItems.filter(i => !i.is_available);
+
+  const markAvailable = async (item) => {
+    try {
+      await api.patch(`/menu/${item._id}`, { is_available: true });
+      setMenuItems(prev => prev.map(i => i._id === item._id ? { ...i, is_available: true } : i));
+      showToast('Item marked available', 'success');
+    } catch { showToast('Failed to update', 'error'); }
+  };
+
+  const toggleStock = async (item) => {
+    const newVal = !item.is_available;
+    try {
+      await api.patch(`/menu/${item._id}`, { is_available: newVal });
+      setMenuItems(prev => prev.map(i => i._id === item._id ? { ...i, is_available: newVal } : i));
+    } catch { showToast('Failed to toggle', 'error'); }
+  };
 
   const staffOnShift = [
     { name: 'Marco L.', role: 'Head Chef', status: 'Active since 9:30 AM', color: 'bg-amber-500' },
@@ -215,27 +234,53 @@ export default function Dashboard() {
         {/* Right Alerts Column */}
         <div className="w-64 flex-shrink-0 hidden xl:block space-y-4">
 
-          {/* Alerts & Stock */}
+
+
+          {/* Out of Stock Items */}
           <div className="bg-[#2e1b0e] rounded-[4px] p-4">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-yellow-400 text-lg">warning</span>
-              <h3 className="text-[#ffdbc7] font-semibold text-sm">Alerts & Stock</h3>
-            </div>
-            <p className="text-[#a0815a] text-[9px] uppercase tracking-widest mb-3">Critical Low Stock</p>
-            <div className="space-y-3">
-              {lowStockItems.map(s => (
-                <div key={s.name}>
-                  <div className="flex justify-between mb-1">
-                    <span className="text-[#ffdbc7] text-xs">{s.name}</span>
-                    <span className="text-red-400 text-xs font-bold">{s.stock}</span>
+            <p className="text-[#a0815a] text-[9px] uppercase tracking-widest mb-3">Out of Stock</p>
+            {outOfStockItems.length === 0 ? (
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+                <p className="text-green-400 text-xs">All items available</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {outOfStockItems.map(item => (
+                  <div key={item._id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[#ffdbc7] text-xs font-medium">{item.name}</p>
+                      <p className="text-[#544434] text-[9px] capitalize">{item.category}</p>
+                    </div>
+                    <button
+                      onClick={() => markAvailable(item)}
+                      className="bg-[#FF9E18]/15 text-[#FF9E18] text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-[2px] hover:bg-[#FF9E18]/30 transition-colors"
+                    >
+                      Mark Available
+                    </button>
                   </div>
-                  <div className="h-1 bg-[#463022] rounded-full overflow-hidden mb-1">
-                    <div className="h-full bg-red-500 rounded-full" style={{ width: `${s.pct}%` }} />
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-[#544434] text-[9px]">Threshold: {s.threshold}</span>
-                    <button className="text-[#FF9E18] text-[9px] uppercase tracking-wider hover:underline">Update Stock</button>
-                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Stock Toggle */}
+          <div className="bg-[#2e1b0e] rounded-[4px] p-4">
+            <p className="text-[#a0815a] text-[9px] uppercase tracking-widest mb-3">Quick Stock Toggle</p>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {menuItems.slice(0, 12).map(item => (
+                <div key={item._id} className="flex items-center justify-between">
+                  <span className="text-[#ffdbc7] text-[10px] truncate flex-1 mr-2">{item.name}</span>
+                  <button
+                    onClick={() => toggleStock(item)}
+                    className={`relative w-8 h-4 rounded-full transition-colors flex-shrink-0 ${
+                      item.is_available ? 'bg-green-600' : 'bg-[#463022]'
+                    }`}
+                  >
+                    <span className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${
+                      item.is_available ? 'translate-x-4' : 'translate-x-0.5'
+                    }`} />
+                  </button>
                 </div>
               ))}
             </div>

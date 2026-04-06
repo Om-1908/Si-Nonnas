@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
   orderType: {
     type: String,
     enum: ['dine-in', 'takeaway'],
-    default: 'dine-in',
+    default: 'dine-in',   // fixed: was 'takeaway'
   },
   items: [orderItemSchema],
   subtotal: { type: Number, required: true },
@@ -34,8 +34,13 @@ const orderSchema = new mongoose.Schema({
   statusHistory: [statusHistorySchema],
   paymentStatus: {
     type: String,
-    enum: ['pending', 'paid', 'failed'],
+    enum: ['pending', 'cash-pending', 'cash-confirmed', 'paid', 'failed'],
     default: 'pending',
+  },
+  paymentMethod: {
+    type: String,
+    enum: ['upi', 'cash', null],
+    default: null,
   },
 }, { timestamps: true });
 

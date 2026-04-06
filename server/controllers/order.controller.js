@@ -4,6 +4,7 @@ const Order = require('../models/Order');
 exports.createOrder = async (req, res) => {
   try {
     const { items, tableNumber, orderType } = req.body;
+    console.log('Order created with type:', orderType, 'table:', tableNumber);
 
     const subtotal = items.reduce((sum, item) => sum + item.price * item.qty, 0);
     const tax = Math.round(subtotal * 0.05 * 100) / 100;
@@ -34,7 +35,7 @@ exports.createOrder = async (req, res) => {
   }
 };
 
-// GET /api/orders — all orders with filters (manager)
+// GET /api/orders — all orders with filters (manager). Default: last 30 days, newest first.
 exports.getOrders = async (req, res) => {
   try {
     const { status, from, to, limit = 50, sort = 'recent' } = req.query;
@@ -43,11 +44,16 @@ exports.getOrders = async (req, res) => {
     if (status) {
       filter.status = { $in: status.split(',') };
     }
-    if (from || to) {
-      filter.createdAt = {};
-      if (from) filter.createdAt.$gte = new Date(from);
-      if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');
-    }
+
+    // Date filter — default to last 30 days if no params given
+    const now = new Date();
+    const defaultFrom = new Date(now);
+    defaultFrom.setDate(defaultFrom.getDate() - 30);
+
+    filter.createdAt = {};
+    if (from) filter.createdAt.$gte = new Date(from);
+    else filter.createdAt.$gte = defaultFrom;
+    if (to) filter.createdAt.$lte = new Date(to + 'T23:59:59.999Z');
 
     const sortObj = sort === 'recent' ? { createdAt: -1 } : { createdAt: 1 };
 
@@ -114,7 +120,7 @@ exports.getOrder = async (req, res) => {
   }
 };
 
-// PATCH /api/orders/:id/status — update status
+// PATCH /api/orders/:id/status — update status (kitchen_staff + manager)
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -139,6 +145,44 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PATCH /api/orders/:id/payment-status
+exports.updatePaymentStatus = async (req, res) => {
+  try {
+    const { paymentStatus, paymentMethod } = req.body;
+    const update = { paymentStatus };
+    if (paymentMethod) update.paymentMethod = paymentMethod;
+
+    const order = await Order.findByIdAndUpdate(
+      req.params.id,
+      update,
+      { new: true }
+    );
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+
+    const io = req.app.get('io');
+    if (io) {
+      if (paymentStatus === 'cash-confirmed') {
+        // Notify customer polling
+        io.to(`order-${req.params.id}`).emit('payment-cash-confirmed', { orderId: req.params.id });
+      }
+      // Notify manager payment audit dashboard
+      if (paymentStatus === 'paid' || paymentStatus === 'cash-confirmed') {
+        io.emit('payment-captured', {
+          _id: order._id,
+          amount: order.total,
+          order: { _id: order._id, orderNumber: order.orderNumber, orderType: order.orderType, tableNumber: order.tableNumber },
+          status: paymentStatus,
+          createdAt: new Date(),
+        });
+      }
+    }
+
+    res.json({ message: 'Payment status updated', order });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

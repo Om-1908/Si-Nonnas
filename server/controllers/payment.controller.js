@@ -85,7 +85,7 @@ exports.getPayments = async (req, res) => {
     }
 
     const payments = await Payment.find(filter)
-      .populate({ path: 'order', select: 'orderNumber total status items' })
+      .populate({ path: 'order', select: 'orderNumber total status items orderType tableNumber' })
       .sort({ createdAt: -1 });
     res.json(payments);
   } catch (error) {

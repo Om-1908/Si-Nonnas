@@ -10,6 +10,19 @@ exports.createReview = async (req, res) => {
       rating,
       comment,
     });
+
+    // Emit real-time event to manager review dashboard
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('new-review', {
+        _id: review._id,
+        rating: review.rating,
+        comment: review.comment,
+        order: review.order,
+        createdAt: review.createdAt,
+      });
+    }
+
     res.status(201).json(review);
   } catch (error) {
     res.status(500).json({ message: error.message });

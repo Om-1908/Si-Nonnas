@@ -9,3 +9,4 @@ router.get('/export', verifyToken, requireRole('manager'), exportPayments);
 router.get('/', verifyToken, requireRole('manager'), getPayments);
 
 module.exports = router;
+
