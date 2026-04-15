@@ -65,7 +65,7 @@ export default function Ingredients() {
       </section>
 
       {/* ── PULL QUOTE ── */}
-      <section className="bg-[#200f04] py-14 px-6">
+      <section className="bg-[#200f04] py-12 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <span className="text-[#FF9E18] text-6xl font-heading italic leading-none block mb-4">"</span>
           <blockquote className="font-heading text-2xl md:text-3xl text-[#ffdbc7] italic leading-snug">
@@ -78,27 +78,28 @@ export default function Ingredients() {
       </section>
 
       {/* ── INGREDIENTS GRID ── */}
-      <section className="py-20 px-6 bg-[#1a0a02]">
+      <section className="py-12 px-6 bg-[#1a0a02]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8">
             <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-3">The Building Blocks</p>
             <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic">
               Seven ingredients. One promise.
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="flex flex-wrap justify-center gap-6">
             {ingredients.map(ing => (
               <div
                 key={ing.name}
                 className="bg-[#2e1b0e] rounded-[2px] p-7 flex flex-col items-center text-center group hover:bg-[#3a2518] transition-colors"
+                style={{ width: '260px', flexShrink: 0 }}
               >
                 {/* SVG icon from sinonnas.com */}
-                <div className="w-20 h-20 mb-5 flex items-center justify-center">
+                <div className="w-28 h-28 mb-5 flex items-center justify-center">
                   <img
                     src={ing.svg}
                     alt={ing.name}
-                    className="max-w-[64px] max-h-[64px] object-contain group-hover:scale-110 transition-transform duration-300"
+                    className="w-24 h-24 object-contain brightness-0 invert group-hover:scale-110 transition-transform duration-300"
                     onError={e => {
                       e.target.style.display = 'none';
                       e.target.nextSibling.style.display = 'flex';
@@ -107,8 +108,8 @@ export default function Ingredients() {
                   {/* Fallback emoji */}
                   <div className="hidden w-16 h-16 rounded-full bg-[#463022] items-center justify-center text-3xl">🍕</div>
                 </div>
-                <h3 className="font-heading text-[#ffdbc7] font-bold text-base mb-2">{ing.name}</h3>
-                <p className="text-[#a0815a] text-xs leading-relaxed">{ing.desc}</p>
+                <h3 className="font-heading text-[#f5e6c8] font-bold text-base mb-2 text-center">{ing.name}</h3>
+                <p className="text-[#a0815a] text-xs leading-relaxed text-center">{ing.desc}</p>
               </div>
             ))}
           </div>
@@ -116,17 +117,17 @@ export default function Ingredients() {
       </section>
 
       {/* ── HYDROPONICS FEATURE ── */}
-      <section className="py-20 px-6 bg-[#2d5016]">
+      <section className="py-12 px-6 bg-[#1f0d04]">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
           <div>
-            <p className="text-[rgba(255,255,255,0.6)] text-[10px] uppercase tracking-[0.2em] mb-3">Innovation</p>
-            <h2 className="font-heading text-4xl font-bold text-white italic mb-5 leading-tight">
+            <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-3">Innovation</p>
+            <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic mb-5 leading-tight">
               Hydroponically grown,<br />harvested for you
             </h2>
-            <p className="text-[rgba(255,255,255,0.75)] text-sm leading-loose mb-5">
+            <p className="text-[#a0815a] text-sm leading-loose mb-5">
               Our fresh herbs — basil, rocket, microgreens — are grown hydroponically in controlled environments within 10km of every restaurant. They arrive within 24 hours of harvest, never chilled below 4°C.
             </p>
-            <p className="text-[rgba(255,255,255,0.75)] text-sm leading-loose mb-5">
+            <p className="text-[#a0815a] text-sm leading-loose mb-5">
               No pesticides, no soil-borne pathogens, no days-long cold-chain. What you taste is what was grown yesterday.
             </p>
             <div className="flex gap-6 mt-8">
@@ -136,24 +137,35 @@ export default function Ingredients() {
                 { val: '0', label: 'Pesticides used' },
               ].map(s => (
                 <div key={s.label}>
-                  <p className="font-heading text-3xl font-bold text-[#a8e06a]">{s.val}</p>
-                  <p className="text-[rgba(255,255,255,0.55)] text-[10px] uppercase tracking-wider">{s.label}</p>
+                  <p className="font-heading text-3xl font-bold text-[#EF9F27]">{s.val}</p>
+                  <p className="text-[#a0815a] text-[10px] uppercase tracking-wider">{s.label}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1620706857370-e1b9770e8bb1?w=800&q=80"
-              alt="Hydroponics farm"
-              className="w-full h-[380px] object-cover rounded-[2px]"
-            />
+          <div className="flex items-center justify-center py-6">
+            <div
+              className="overflow-hidden bg-[#0e0502]"
+              style={{
+                width: '100%',
+                maxWidth: '420px',
+                aspectRatio: '1 / 1',
+                borderRadius: '50%',
+                boxShadow: '0 0 0 6px rgba(255,158,24,0.15), 0 8px 40px rgba(0,0,0,0.6)',
+              }}
+            >
+              <img
+                src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=800&q=80"
+                alt="Hydroponics farm"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-20 px-6 bg-[#1a0a02] text-center">
+      <section className="py-12 px-6 bg-[#1a0a02] text-center">
         <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-4">Taste the Difference</p>
         <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic mb-8">
           Now you know what's in it

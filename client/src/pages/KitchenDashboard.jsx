@@ -12,6 +12,7 @@ export default function KitchenDashboard() {
   const [doneCount, setDoneCount] = useState(0);
   const [clock, setClock] = useState(new Date());
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [updating, setUpdating] = useState(new Set()); // IDs being updated
 
   // Live clock
@@ -31,10 +32,10 @@ export default function KitchenDashboard() {
   // Fetch active orders from server — no mock fallback
   const fetchOrders = useCallback(async () => {
     try {
-      const { data } = await api.get('/orders?status=new,preparing,ready&limit=100');
+      // Only show orders where payment has been confirmed by manager
+      const { data } = await api.get('/orders?status=new,preparing,ready&paymentStatus=cash-confirmed,upi-confirmed,paid&limit=100');
       groupOrders(Array.isArray(data) ? data : []);
     } catch (err) {
-      // If 401, axios interceptor handles redirect. Otherwise show error, start with empty board.
       if (err.response?.status !== 401) {
         showToast('Could not load orders — retrying...', 'error');
       }
@@ -59,7 +60,9 @@ export default function KitchenDashboard() {
     });
 
     socket.on('new-order', (order) => {
-      // Flash highlight new order for 2s then clear
+      // Only add to kitchen board if payment is already confirmed
+      const confirmedStatuses = ['cash-confirmed', 'upi-confirmed', 'paid'];
+      if (!confirmedStatuses.includes(order.paymentStatus)) return;
       setOrders(prev => ({
         ...prev,
         new: [{ ...order, _flash: true }, ...prev.new.filter(o => o._id !== order._id)],
@@ -72,7 +75,24 @@ export default function KitchenDashboard() {
       }, 2000);
     });
 
-    // Listen for status changes from other sessions (manager also changing status)
+    // When manager confirms payment — add the order to kitchen board
+    socket.on('payment-upi-confirmed', ({ orderId }) => {
+      // Re-fetch so we get the full order object
+      fetchOrders();
+    });
+    socket.on('payment-cash-confirmed', ({ orderId }) => {
+      fetchOrders();
+    });
+
+    // When order is cancelled — remove from all columns
+    socket.on('order-cancelled', ({ orderId }) => {
+      setOrders(prev => ({
+        new: prev.new.filter(o => o._id !== orderId),
+        preparing: prev.preparing.filter(o => o._id !== orderId),
+        ready: prev.ready.filter(o => o._id !== orderId),
+      }));
+    });
+
     socket.on('order-status-change', ({ orderId, status }) => {
       setOrders(prev => {
         const allOrders = [...prev.new, ...prev.preparing, ...prev.ready];
@@ -95,6 +115,9 @@ export default function KitchenDashboard() {
     return () => {
       socket.off('new-order');
       socket.off('order-status-change');
+      socket.off('payment-upi-confirmed');
+      socket.off('payment-cash-confirmed');
+      socket.off('order-cancelled');
       socket.off('connect');
       socket.disconnect();
     };
@@ -181,6 +204,17 @@ export default function KitchenDashboard() {
           <span className="text-on-surface font-mono text-lg tabular-nums">
             {clock.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false })}
           </span>
+          {/* Refresh button */}
+          <button
+            onClick={() => {
+              setRefreshing(true);
+              fetchOrders().finally(() => setTimeout(() => setRefreshing(false), 600));
+            }}
+            title="Refresh orders"
+            className="text-muted hover:text-[#FF9E18] transition-colors"
+          >
+            <span className={`material-symbols-outlined text-xl ${refreshing ? 'animate-spin' : ''}`}>refresh</span>
+          </button>
           <button
             onClick={handleLogout}
             className="text-muted hover:text-error transition-colors flex items-center gap-1 text-sm"

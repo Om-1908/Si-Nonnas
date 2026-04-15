@@ -1,14 +1,21 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useCartStore from '../stores/cartStore';
 import useAuthStore from '../stores/authStore';
 
 export default function CartDrawer() {
-  const { items, isOpen, closeDrawer, updateQty, removeItem } = useCartStore();
+  const { items, isOpen, closeDrawer, updateQty, removeItem, tableNumber, setTableNumber } = useCartStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const [tableError, setTableError] = useState('');
 
   const handleViewCart = () => {
+    if (!tableNumber || String(tableNumber).trim() === '') {
+      setTableError('Please enter your table number');
+      return;
+    }
+    setTableError('');
     closeDrawer();
     if (!user) {
       navigate('/login?redirect=/order/review');
@@ -79,6 +86,26 @@ export default function CartDrawer() {
               <span className="font-semibold">₹{subtotal.toLocaleString('en-IN')}</span>
             </div>
             <p className="text-muted/60 text-xs">Taxes and delivery calculated at checkout.</p>
+            {/* Table number input */}
+            <div>
+              <label className="block text-[#a0815a] text-[10px] uppercase tracking-widest font-semibold mb-1.5">
+                Table Number
+              </label>
+              <input
+                type="number"
+                min="1"
+                max="50"
+                value={tableNumber || ''}
+                onChange={e => { setTableNumber(e.target.value); setTableError(''); }}
+                placeholder="Enter your table number"
+                required
+                className="w-full rounded-lg p-3 text-sm bg-[#1a0a02] text-[#f5e6c8] placeholder:text-[#614b38] outline-none"
+                style={{ border: '1px solid rgba(255,158,24,0.3)' }}
+              />
+              {tableError && (
+                <p className="text-red-400 text-xs mt-1">{tableError}</p>
+              )}
+            </div>
             <button onClick={handleViewCart} className="btn-primary w-full text-center">
               View full cart
             </button>

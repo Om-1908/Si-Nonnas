@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 export default function Footer() {
   return (
     <footer className="bg-[#160802] mt-auto border-t border-[rgba(255,255,255,0.05)]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
 
           {/* Brand — official logo at h=48px */}
@@ -30,13 +30,13 @@ export default function Footer() {
               Preserving the soul of Neapolitan sourdough pizza since 1984. Every bite a tribute to tradition.
             </p>
             <div className="flex gap-3 mt-5">
-              <a href="https://instagram.com" target="_blank" rel="noreferrer"
-                className="w-8 h-8 bg-[#2e1b0e] rounded-full flex items-center justify-center text-[#a0815a] hover:text-[#FF9E18] hover:bg-[#3a2518] transition-colors">
-                <span className="material-symbols-outlined text-sm">photo_camera</span>
+              <a href="https://www.instagram.com/sinonnas/" target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 bg-[#2e1b0e] rounded-full flex items-center justify-center text-[#a0815a] hover:text-[#FF9E18] hover:bg-[#3a2518] transition-colors">
+                <span className="material-symbols-outlined text-xl">photo_camera</span>
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer"
-                className="w-8 h-8 bg-[#2e1b0e] rounded-full flex items-center justify-center text-[#a0815a] hover:text-[#FF9E18] hover:bg-[#3a2518] transition-colors">
-                <span className="material-symbols-outlined text-sm">thumb_up</span>
+              <a href="https://maps.app.goo.gl/A2ESFjouL4dpUUcr5" target="_blank" rel="noopener noreferrer"
+                className="w-10 h-10 bg-[#2e1b0e] rounded-full flex items-center justify-center text-[#a0815a] hover:text-[#FF9E18] hover:bg-[#3a2518] transition-colors">
+                <span className="material-symbols-outlined text-xl">map</span>
               </a>
             </div>
           </div>
@@ -65,9 +65,10 @@ export default function Footer() {
           <div>
             <h4 className="text-[#a0815a] text-[10px] font-semibold uppercase tracking-[0.18em] mb-5">Get in Touch</h4>
             <div className="text-[#614b38] text-sm space-y-2 leading-relaxed">
-              <p>124 Artisanal Way, Bandra West</p>
-              <p>Mumbai, MH 400050</p>
-              <p className="mt-3">+91 22 7123 4567</p>
+              <p>FC Road, Shop No. 1-9, Lower Ground Floor, One Place,</p>
+              <p>Fergusson College Rd, Bhamburda, Shivajinagar,</p>
+              <p>Pune, Maharashtra 411005</p>
+              <p className="mt-3">+91 84214 16934</p>
               <a href="mailto:ciao@sinonnas.com" className="hover:text-[#ffdbc7] transition-colors">ciao@sinonnas.com</a>
             </div>
           </div>

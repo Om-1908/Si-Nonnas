@@ -31,6 +31,7 @@ export default function OrderOverview() {
   const [filter, setFilter] = useState('');
   const [expanded, setExpanded] = useState(null); // order detail expand
   const [openDays, setOpenDays] = useState({ [todayKey()]: true }); // today open by default
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchOrders = (params = {}) => {
     const qs = new URLSearchParams(params).toString();
@@ -69,6 +70,23 @@ export default function OrderOverview() {
     } catch { showToast('Failed to confirm cash payment', 'error'); }
   };
 
+  const confirmUpi = async (orderId) => {
+    try {
+      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'upi-confirmed', paymentMethod: 'upi' });
+      setOrders(prev => prev.map(o => o._id === orderId ? { ...o, paymentStatus: 'upi-confirmed' } : o));
+      showToast('UPI payment confirmed!', 'success');
+    } catch { showToast('Failed to confirm UPI payment', 'error'); }
+  };
+
+  const cancelOrder = async (orderId) => {
+    try {
+      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'payment-cancelled' });
+      setOrders(prev => prev.map(o => o._id === orderId
+        ? { ...o, paymentStatus: 'payment-cancelled', status: 'cancelled' } : o));
+      showToast('Order cancelled', 'success');
+    } catch { showToast('Failed to cancel order', 'error'); }
+  };
+
   const toggleDay = (key) => setOpenDays(prev => ({ ...prev, [key]: !prev[key] }));
 
   const grouped = groupByDay(orders);
@@ -91,9 +109,23 @@ export default function OrderOverview() {
     <div className="p-6 lg:p-8 max-w-6xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="font-heading text-2xl font-bold text-on-surface">All Orders</h1>
-        <button onClick={handleExport} className="btn-secondary flex items-center gap-2 text-sm">
-          <span className="material-symbols-outlined text-lg">download</span>Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          {/* Refresh */}
+          <button
+            onClick={() => {
+              setRefreshing(true);
+              fetchOrders(filter ? { status: filter } : {});
+              setTimeout(() => setRefreshing(false), 700);
+            }}
+            title="Refresh orders"
+            className="flex items-center gap-1 text-sm border border-[#463022] text-[#a0815a] px-3 py-2 rounded-[4px] hover:border-[#a0815a] hover:text-[#ffdbc7] transition-colors"
+          >
+            <span className={`material-symbols-outlined text-lg ${refreshing ? 'animate-spin' : ''}`}>refresh</span>
+          </button>
+          <button onClick={handleExport} className="btn-secondary flex items-center gap-2 text-sm">
+            <span className="material-symbols-outlined text-lg">download</span>Export CSV
+          </button>
+        </div>
       </div>
 
       {/* Status Tabs */}
@@ -157,18 +189,49 @@ export default function OrderOverview() {
                               💰 Cash Payment Pending
                             </span>
                           )}
+                          {/* UPI pending badge */}
+                          {o.paymentStatus === 'upi-pending' && (
+                            <span className="bg-blue-900/20 text-blue-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                              📲 UPI Payment Pending Verification
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="text-on-surface font-semibold text-sm">₹{o.total}</span>
                           <span className={`text-xs capitalize px-2 py-0.5 rounded-sm ${statusBadge(o.status)}`}>{o.status}</span>
-                          {/* Confirm Cash button */}
+                          {/* Confirm Cash + Cancel buttons */}
                           {o.paymentStatus === 'cash-pending' && (
-                            <button
-                              onClick={e => { e.stopPropagation(); confirmCash(o._id); }}
-                              className="bg-[#FF9E18] text-[#2c1700] text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-[#ffb84d] transition-colors"
-                            >
-                              Confirm Cash
-                            </button>
+                            <>
+                              <button
+                                onClick={e => { e.stopPropagation(); confirmCash(o._id); }}
+                                className="bg-[#FF9E18] text-[#2c1700] text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-[#ffb84d] transition-colors"
+                              >
+                                Confirm Cash
+                              </button>
+                              <button
+                                onClick={e => { e.stopPropagation(); cancelOrder(o._id); }}
+                                className="bg-red-900/40 text-red-400 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-red-900/70 transition-colors"
+                              >
+                                Cancel Order
+                              </button>
+                            </>
+                          )}
+                          {/* Confirm UPI + Cancel buttons */}
+                          {o.paymentStatus === 'upi-pending' && (
+                            <>
+                              <button
+                                onClick={e => { e.stopPropagation(); confirmUpi(o._id); }}
+                                className="bg-blue-700 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-blue-600 transition-colors"
+                              >
+                                Confirm UPI
+                              </button>
+                              <button
+                                onClick={e => { e.stopPropagation(); cancelOrder(o._id); }}
+                                className="bg-red-900/40 text-red-400 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-red-900/70 transition-colors"
+                              >
+                                Cancel Order
+                              </button>
+                            </>
                           )}
                           {/* Mark Complete button for "ready" orders */}
                           {o.status === 'ready' && o.paymentStatus !== 'cash-pending' && (

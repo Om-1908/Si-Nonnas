@@ -26,21 +26,26 @@ export default function ManagerLayout() {
     <div className="flex h-screen bg-surface-container-lowest overflow-hidden">
       {/* Sidebar */}
       <aside className={`${collapsed ? 'w-16' : 'w-64'} bg-surface-container flex flex-col border-r border-outline-variant/10 transition-all duration-300 flex-shrink-0`}>
-        {/* Brand */}
-        <div className="px-4 py-5 flex items-center justify-between border-b border-outline-variant/10">
+        {/* Brand — Logo */}
+        <div className="px-4 py-4 flex items-center justify-between border-b border-outline-variant/10">
           {!collapsed && (
-            <span className="font-heading text-lg font-bold text-primary-container">Si Nonna's</span>
+            <img
+              src="https://sinonnas.com/wp-content/uploads/2022/06/Logo-3.png"
+              alt="Si Nonna's"
+              className="h-14 w-auto object-contain brightness-0 invert opacity-90"
+              onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+            />
           )}
+          {!collapsed && <span className="hidden text-primary-container font-heading font-bold">Si Nonna's</span>}
           <button onClick={() => setCollapsed(!collapsed)} className="text-muted hover:text-on-surface transition-colors">
             <span className="material-symbols-outlined text-xl">{collapsed ? 'menu_open' : 'menu'}</span>
           </button>
         </div>
 
-        {/* Manager info */}
-        {!collapsed && user && (
-          <div className="px-4 py-3 border-b border-outline-variant/10">
-            <p className="text-on-surface text-sm font-medium truncate">{user.name}</p>
-            <p className="text-muted text-xs">Manager</p>
+        {/* Manager role display — collapsed shows icon only */}
+        {!collapsed && (
+          <div className="px-4 py-2 border-b border-outline-variant/10">
+            <p className="text-muted text-xs">Manager Portal</p>
           </div>
         )}
 

@@ -52,7 +52,7 @@ export default function ReviewManagement() {
   };
 
   return (
-    <div className="p-6 lg:p-8 max-w-4xl">
+    <div className="p-6 max-w-4xl">
       <h1 className="font-heading text-2xl font-bold text-on-surface mb-6">Customer Reviews</h1>
 
       {/* Star Filter */}

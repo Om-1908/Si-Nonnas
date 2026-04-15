@@ -16,6 +16,7 @@ const menuItemSchema = new mongoose.Schema({
   imageUrl: { type: String, default: '' },
   isVeg: { type: Boolean, default: false },
   is_available: { type: Boolean, default: true },
+  isSignature: { type: Boolean, default: false },
   deleted_at: { type: Date, default: null },
   locationBadge: { type: String, default: null },
 }, { timestamps: true });

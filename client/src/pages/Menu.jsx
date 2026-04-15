@@ -56,13 +56,7 @@ export default function Menu() {
     <div className="min-h-screen flex flex-col bg-[#1a0a02]">
       <Navbar />
 
-      {/* Alert Banner (can be dynamic) */}
-      <div className="bg-[#463022] border-b border-[#544434] px-6 py-2.5">
-        <p className="text-[#ffc589] text-xs text-center">
-          <span className="material-symbols-outlined text-xs align-middle mr-1">info</span>
-          Dining in? Ask for your table's QR code or <a href="/qr-menu/demo" className="underline ml-1">use our QR menu</a> to order directly from your seat.
-        </p>
-      </div>
+
 
       <div className="flex-1 flex flex-col">
         {/* Hero Banner */}
@@ -84,14 +78,13 @@ export default function Menu() {
           {/* Left: Menu Content */}
           <div className="flex-1 min-w-0">
             {/* Category Tabs */}
-            <div className="flex gap-2 mb-8 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
               {categories.map(cat => (
                 <button key={cat} onClick={() => scrollTo(cat)}
-                  className={`flex-shrink-0 px-4 py-2 rounded-[2px] text-xs font-semibold uppercase tracking-wider transition-all ${
-                    activeCategory === cat
-                      ? 'bg-[#FF9E18] text-[#2c1700]'
-                      : 'bg-[#2e1b0e] text-[#a0815a] hover:bg-[#3a2518] hover:text-[#ffdbc7]'
-                  }`}>
+                  className={`flex-shrink-0 px-4 py-2 rounded-[2px] text-xs font-semibold uppercase tracking-wider transition-all ${activeCategory === cat
+                    ? 'bg-[#FF9E18] text-[#2c1700]'
+                    : 'bg-[#2e1b0e] text-[#a0815a] hover:bg-[#3a2518] hover:text-[#ffdbc7]'
+                    }`}>
                   {CATEGORY_LABELS[cat] || cat}
                 </button>
               ))}
@@ -102,13 +95,13 @@ export default function Menu() {
               const catItems = menuItems.filter(i => i.category === cat);
               if (!catItems.length) return null;
               return (
-                <section key={cat} ref={el => (sectionsRef.current[cat] = el)} className="mb-12 scroll-mt-8">
-                  <div className="mb-5">
+                <section key={cat} ref={el => (sectionsRef.current[cat] = el)} className="mb-10 scroll-mt-8">
+                  <div className="mb-4">
                     <p className="text-[#a0815a] text-[9px] uppercase tracking-[0.2em]">Category</p>
                     <h2 className="font-heading text-2xl font-bold text-[#ffdbc7] italic">{CATEGORY_LABELS[cat] || cat}</h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                     {catItems.map(item => (
                       <div key={item._id} className={`bg-[#2e1b0e] rounded-[4px] overflow-hidden hover:bg-[#3a2518] transition-colors ${!item.is_available ? 'opacity-50' : ''}`}>
                         {item.imageUrl && (

@@ -16,14 +16,14 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-[rgba(26,10,2,0.92)] backdrop-blur-md border-b border-[rgba(255,255,255,0.06)]">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
 
           {/* Logo — Official Si Nonna's PNG */}
           <Link to="/" className="flex items-center flex-shrink-0 group">
             <img
               src="https://sinonnas.com/wp-content/uploads/2022/06/Logo-3.png"
               alt="Si Nonna's"
-              style={{ height: '36px', width: 'auto' }}
+              style={{ height: '56px', width: 'auto' }}
               className="object-contain brightness-0 invert opacity-90 group-hover:opacity-100 transition-opacity"
               onError={e => {
                 e.target.style.display = 'none';

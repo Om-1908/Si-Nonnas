@@ -13,6 +13,8 @@ import ManagerLayout from './components/ManagerLayout';
 // Pages
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 import Homepage from './pages/Homepage';
 import OurStory from './pages/OurStory';
 import Ingredients from './pages/Ingredients';
@@ -53,6 +55,8 @@ const router = createBrowserRouter([
       // Public routes
       { path: '/login', element: <Login /> },
       { path: '/signup', element: <Signup /> },
+      { path: '/forgot-password', element: <ForgotPassword /> },
+      { path: '/reset-password/:token', element: <ResetPassword /> },
       { path: '/', element: <Homepage /> },
       { path: '/story', element: <OurStory /> },
       { path: '/ingredients', element: <Ingredients /> },

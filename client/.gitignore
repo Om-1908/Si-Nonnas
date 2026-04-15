@@ -12,6 +12,11 @@ dist
 dist-ssr
 *.local
 
+# Environment — keep .env.production (public URLs only), exclude local secrets
+.env
+.env.local
+.env.*.local
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

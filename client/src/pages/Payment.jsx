@@ -4,14 +4,16 @@ import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import api from '../lib/axios';
 import { showToast } from '../components/Toast';
-import QRCodeImage from './QRCODE.jpeg';
+
 
 export default function Payment() {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [showQR, setShowQR] = useState(false);
-  const [confirming, setConfirming] = useState(false);
+  // UPI pending state
+  const [upiPending, setUpiPending] = useState(false);
+  const [upiCancelling, setUpiCancelling] = useState(false);
   // Cash payment flow state
   const [cashPending, setCashPending] = useState(false);
   const [cashCancelling, setCashCancelling] = useState(false);
@@ -26,16 +28,40 @@ export default function Payment() {
   // Cleanup polling on unmount
   useEffect(() => () => { if (pollRef.current) clearInterval(pollRef.current); }, []);
 
+  // Called when user clicks "Payment Done" in the QR modal
   const handlePaymentDone = async () => {
-    setConfirming(true);
     try {
-      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'paid', paymentMethod: 'upi' });
+      await api.patch(`/orders/${orderId}/payment-status`, {
+        paymentStatus: 'upi-pending',
+        paymentMethod: 'upi',
+      });
       setShowQR(false);
-      navigate(`/receipt/${orderId}`);
+      setUpiPending(true);
+      // Poll every 5s for upi-confirmed
+      pollRef.current = setInterval(async () => {
+        try {
+          const { data } = await api.get(`/orders/${orderId}`);
+          if (data.paymentStatus === 'upi-confirmed') {
+            clearInterval(pollRef.current);
+            navigate(`/receipt/${orderId}`);
+          }
+        } catch { /* ignore poll errors */ }
+      }, 5000);
     } catch (err) {
-      showToast(err.response?.data?.message || 'Failed to confirm payment', 'error');
+      showToast(err.response?.data?.message || 'Failed to submit payment', 'error');
+    }
+  };
+
+  const handleCancelUpi = async () => {
+    setUpiCancelling(true);
+    try {
+      clearInterval(pollRef.current);
+      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'payment-cancelled' });
+      setUpiPending(false);
+    } catch {
+      showToast('Failed to cancel UPI request', 'error');
     } finally {
-      setConfirming(false);
+      setUpiCancelling(false);
     }
   };
 
@@ -62,7 +88,7 @@ export default function Payment() {
     setCashCancelling(true);
     try {
       clearInterval(pollRef.current);
-      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'pending' });
+      await api.patch(`/orders/${orderId}/payment-status`, { paymentStatus: 'payment-cancelled' });
       setCashPending(false);
     } catch {
       showToast('Failed to cancel cash request', 'error');
@@ -111,8 +137,31 @@ export default function Payment() {
             </div>
           </div>
 
-          {/* Cash pending confirmation screen */}
-          {cashPending ? (
+          {/* UPI pending screen */}
+          {upiPending ? (
+            <div className="bg-[#2e1b0e] rounded-[4px] p-6 text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
+                <span className="w-3 h-3 rounded-full bg-[#FF9E18] animate-pulse" />
+                <span className="w-3 h-3 rounded-full bg-[#FF9E18] animate-pulse" style={{ animationDelay: '0.2s' }} />
+                <span className="w-3 h-3 rounded-full bg-[#FF9E18] animate-pulse" style={{ animationDelay: '0.4s' }} />
+              </div>
+              <h2 className="font-heading text-xl font-bold text-[#ffdbc7] mb-2">
+                Waiting for manager to verify payment...
+              </h2>
+              <p className="text-[#a0815a] text-sm mb-3 leading-relaxed">
+                Your payment screenshot has been noted. Please wait.
+              </p>
+              <p className="text-[#544434] text-xs mb-5">Order {order.orderNumber}</p>
+              <button
+                onClick={handleCancelUpi}
+                disabled={upiCancelling}
+                className="border border-[#544434] text-[#a0815a] text-xs uppercase tracking-wider px-6 py-2 rounded-[2px] hover:border-[#a0815a] hover:text-[#ffdbc7] transition-colors disabled:opacity-50"
+              >
+                {upiCancelling ? 'Cancelling...' : 'Cancel request'}
+              </button>
+            </div>
+          ) : cashPending ? (
+            /* Cash pending confirmation screen */
             <div className="bg-[#2e1b0e] rounded-[4px] p-6 text-center">
               <span className="material-symbols-outlined text-4xl text-green-400 block mb-3">check_circle</span>
               <h2 className="font-heading text-xl font-bold text-[#ffdbc7] mb-2">Cash payment requested!</h2>
@@ -198,22 +247,21 @@ export default function Payment() {
 
             {/* Local QR image */}
             <img
-              src={QRCodeImage}
+              src="https://images.unsplash.com/photo-1776281618721-0026d70ce84b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwcm9maWxlLXBhZ2V8MXx8fGVufDB8fHx8fA%3D%3D"
               alt="Payment QR Code"
               style={{ width: '100%', maxWidth: '280px', borderRadius: '8px', display: 'block', margin: '1rem auto' }}
             />
 
             <p className="text-[#a0815a] text-center mb-6" style={{ fontSize: '13px' }}>
-              Show this screen to staff after payment
+              After paying, click "Payment Done" and wait for manager to verify
             </p>
 
             <div className="flex gap-3 w-full">
               <button
                 onClick={handlePaymentDone}
-                disabled={confirming}
-                className="flex-1 bg-[#FF9E18] text-[#2c1700] font-bold uppercase tracking-[0.08em] py-3 rounded-[2px] hover:bg-[#ffb84d] transition-colors text-xs disabled:opacity-50"
+                className="flex-1 bg-[#FF9E18] text-[#2c1700] font-bold uppercase tracking-[0.08em] py-3 rounded-[2px] hover:bg-[#ffb84d] transition-colors text-xs"
               >
-                {confirming ? 'Confirming...' : 'Payment Done'}
+                Payment Done
               </button>
               <button
                 onClick={() => setShowQR(false)}

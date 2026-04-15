@@ -25,7 +25,7 @@ export default function ReservationManagement() {
   const statusColors = { pending: 'bg-yellow-900/30 text-yellow-400', confirmed: 'bg-green-900/30 text-green-400', cancelled: 'bg-red-900/30 text-error' };
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl">
+    <div className="p-6 max-w-6xl">
       <h1 className="font-heading text-2xl font-bold text-on-surface mb-6">Reservations</h1>
 
       <div className="flex gap-2 mb-6">

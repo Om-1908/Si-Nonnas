@@ -17,7 +17,7 @@ export default function Analytics() {
   const chartTheme = { stroke: '#FF9E18', fill: 'rgba(255,158,24,0.15)', text: '#a0815a', grid: '#544434' };
 
   return (
-    <div className="p-6 lg:p-8 max-w-6xl">
+    <div className="p-6 max-w-6xl">
       <h1 className="font-heading text-2xl font-bold text-on-surface mb-8">Sales Analytics</h1>
 
       {/* Revenue Chart */}

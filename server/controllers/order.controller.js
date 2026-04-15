@@ -38,11 +38,15 @@ exports.createOrder = async (req, res) => {
 // GET /api/orders — all orders with filters (manager). Default: last 30 days, newest first.
 exports.getOrders = async (req, res) => {
   try {
-    const { status, from, to, limit = 50, sort = 'recent' } = req.query;
+    const { status, paymentStatus, from, to, limit = 50, sort = 'recent' } = req.query;
     const filter = {};
 
     if (status) {
       filter.status = { $in: status.split(',') };
+    }
+
+    if (paymentStatus) {
+      filter.paymentStatus = { $in: paymentStatus.split(',') };
     }
 
     // Date filter — default to last 30 days if no params given
@@ -157,6 +161,11 @@ exports.updatePaymentStatus = async (req, res) => {
     const update = { paymentStatus };
     if (paymentMethod) update.paymentMethod = paymentMethod;
 
+    // If payment was cancelled, also cancel the order itself
+    if (paymentStatus === 'payment-cancelled') {
+      update.status = 'cancelled';
+    }
+
     const order = await Order.findByIdAndUpdate(
       req.params.id,
       update,
@@ -167,11 +176,16 @@ exports.updatePaymentStatus = async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       if (paymentStatus === 'cash-confirmed') {
-        // Notify customer polling
         io.to(`order-${req.params.id}`).emit('payment-cash-confirmed', { orderId: req.params.id });
       }
-      // Notify manager payment audit dashboard
-      if (paymentStatus === 'paid' || paymentStatus === 'cash-confirmed') {
+      if (paymentStatus === 'upi-confirmed') {
+        io.to(`order-${req.params.id}`).emit('payment-upi-confirmed', { orderId: req.params.id });
+      }
+      if (paymentStatus === 'payment-cancelled') {
+        io.emit('order-cancelled', { orderId: req.params.id });
+      }
+      // Notify manager payment dashboard
+      if (paymentStatus === 'paid' || paymentStatus === 'cash-confirmed' || paymentStatus === 'upi-confirmed') {
         io.emit('payment-captured', {
           _id: order._id,
           amount: order.total,

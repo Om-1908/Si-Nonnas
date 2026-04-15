@@ -1,5 +1,15 @@
 const MenuItem = require('../models/MenuItem');
 
+// GET /api/menu/signature — public, signature items
+exports.getSignatureItems = async (req, res) => {
+  try {
+    const items = await MenuItem.find({ isSignature: true, deleted_at: null }).sort({ name: 1 });
+    res.json(items);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // GET /api/menu — public, non-deleted items
 exports.getMenu = async (req, res) => {
   try {
@@ -10,10 +20,10 @@ exports.getMenu = async (req, res) => {
   }
 };
 
-// GET /api/menu/admin — all items including deleted (manager only)
+// GET /api/menu/admin — active (non-deleted) items for manager
 exports.getMenuAdmin = async (req, res) => {
   try {
-    const items = await MenuItem.find().sort({ category: 1, name: 1 });
+    const items = await MenuItem.find({ deleted_at: null }).sort({ category: 1, name: 1 });
     res.json(items);
   } catch (error) {
     res.status(500).json({ message: error.message });

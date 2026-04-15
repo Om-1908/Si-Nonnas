@@ -22,16 +22,19 @@ export default function OurStory() {
       <Navbar />
 
       {/* ── HERO ── */}
-      <section className="relative h-[500px] overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1555817129-2c96d1c2c85e?w=1600&q=80"
-          alt="Naples pizza story"
-          className="w-full h-full object-cover object-center"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[rgba(26,10,2,0.55)] via-[rgba(26,10,2,0.4)] to-[rgba(26,10,2,0.9)]" />
+      <section
+        className="relative overflow-hidden"
+        style={{
+          backgroundImage: `url('https://t3.ftcdn.net/jpg/04/83/75/78/360_F_483757812_qtfLc1ZGi1DO80NelBT59sYcmWY5uC5B.jpg')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          minHeight: '500px',
+        }}
+      >
+        <div className="absolute inset-0" style={{ background: 'rgba(26,10,2,0.65)' }} />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
           <p className="text-[#FF9E18] text-[10px] uppercase tracking-[0.25em] mb-4">Our Heritage</p>
-          <h1 className="font-heading text-5xl md:text-7xl font-bold text-[#ffdbc7] italic leading-tight max-w-2xl">
+          <h1 className="font-heading text-5xl md:text-7xl font-bold text-[#f5e6c8] italic leading-tight max-w-2xl">
             A pizza story from Naples
           </h1>
           <p className="text-[#dac2ae] text-base mt-5 max-w-lg leading-relaxed">
@@ -41,8 +44,8 @@ export default function OurStory() {
       </section>
 
       {/* ── NAPLES STORY — alternating image-text ── */}
-      <section className="py-20 px-6 bg-[#1a0a02]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-12 px-6 bg-[#1a0a02]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div>
             <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-3">The Beginning</p>
             <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic mb-6 leading-tight">
@@ -73,8 +76,8 @@ export default function OurStory() {
       </section>
 
       {/* ── THE DOUGH SECTION — reversed ── */}
-      <section className="py-20 px-6 bg-[#200f04]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <section className="py-12 px-6 bg-[#200f04]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           <div className="order-2 lg:order-1 relative">
             <img
               src="https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&q=80"
@@ -107,9 +110,9 @@ export default function OurStory() {
       </section>
 
       {/* ── OUR PROMISE — 3 column ── */}
-      <section className="py-20 px-6 bg-[#1a0a02]">
+      <section className="py-12 px-6 bg-[#1a0a02]">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8">
             <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-3">Our Promise</p>
             <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic">
               Three things we will never compromise on
@@ -117,7 +120,7 @@ export default function OurStory() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {promises.map(p => (
-              <div key={p.title} className="bg-[#2e1b0e] rounded-[2px] p-8 text-center hover:bg-[#3a2518] transition-colors group">
+              <div key={p.title} className="bg-[#2e1b0e] rounded-[2px] p-6 text-center hover:bg-[#3a2518] transition-colors group">
                 <div className="text-4xl mb-5">{p.icon}</div>
                 <h3 className="font-heading text-xl font-bold text-[#ffdbc7] mb-3">{p.title}</h3>
                 <p className="text-[#a0815a] text-sm leading-relaxed">{p.desc}</p>
@@ -128,9 +131,9 @@ export default function OurStory() {
       </section>
 
       {/* ── JOURNEY TIMELINE ── */}
-      <section className="py-20 px-6 bg-[#200f04]">
+      <section className="py-10 px-6 bg-[#200f04]">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="text-center mb-8">
             <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-3">The Journey</p>
             <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic">
               From one oven to 41
@@ -161,7 +164,7 @@ export default function OurStory() {
       </section>
 
       {/* ── CTA ── */}
-      <section className="py-20 px-6 bg-[#1a0a02] text-center">
+      <section className="py-10 px-6 bg-[#1a0a02] text-center">
         <p className="text-[#a0815a] text-[10px] uppercase tracking-[0.2em] mb-4">Experience It</p>
         <h2 className="font-heading text-4xl font-bold text-[#ffdbc7] italic mb-8">
           Now it's your turn to taste the story
