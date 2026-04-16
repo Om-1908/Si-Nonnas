@@ -97,9 +97,9 @@ export default function Login() {
       {/* ── LEFT PANEL ── */}
       <div className="relative flex-shrink-0 h-[120px] md:h-auto md:w-[75vw] overflow-hidden">
         <img
-          src="https://b.zmtcdn.com/data/pictures/7/20906977/e12a7f8d35e6f3dcb1e55ad59296a01f.jpeg?fit=around|960:500&crop=960:500;*,*"
+          src="https://b.zmtcdn.com/data/pictures/7/20906977/1d655bade4c6dfd283d0f5cd235d5bcb.jpg"
           alt="Pizza oven"
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full  object-cover scale-125"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[rgba(26,10,2,0.90)] via-[rgba(26,10,2,0.35)] to-[rgba(255,158,24,0.12)]" />
         <div className="relative z-10 h-full flex flex-col px-10 py-8">
