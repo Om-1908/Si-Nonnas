@@ -74,8 +74,8 @@ export const mockSlots = {
 
 export const CATEGORY_LABELS = {
   pizzas: 'Sourdough Pizzas',
-  panzerotto: 'Panzerottos',
-  panuozzos: 'Panuozzos',
+  panzerotto: 'Prosciutto Board',
+  panuozzos: 'Sourdough Panuozzo',
   bites: 'Bites to Start',
   fried: 'Fried',
   salads: 'Salads',

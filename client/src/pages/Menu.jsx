@@ -10,7 +10,7 @@ import socket from '../lib/socket';
 import { mockMenuItems, CATEGORY_LABELS } from '../lib/mockData';
 import { showToast } from '../components/Toast';
 
-const CATEGORY_ORDER = ['pizzas', 'panzerotto', 'salads', 'beer_wine', 'beverages', 'desserts', 'sides'];
+const CATEGORY_ORDER = ['pizzas', 'panuozzos', 'panzerotto', 'bites', 'fried', 'salads', 'dips', 'desserts', 'gelatos', 'coffee', 'beer_wine', 'beverages', 'soft_drinks', 'sides'];
 
 export default function Menu() {
   const queryClient = useQueryClient();

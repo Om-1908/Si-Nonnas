@@ -132,11 +132,7 @@ export default function Homepage() {
                     </div>
                   )}
 
-                  {item.isVeg && (
-                    <div className="absolute top-4 left-4 bg-emerald-700 text-white text-[10px] font-bold px-3 py-1 rounded-full tracking-wider shadow-md">
-                      VEG
-                    </div>
-                  )}
+
                 </div>
 
                 <div className="p-6">

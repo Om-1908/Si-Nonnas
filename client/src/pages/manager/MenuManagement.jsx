@@ -111,62 +111,86 @@ export default function MenuManagement() {
         </div>
       )}
 
-      {/* Items Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {items.map(item => (
-          <div key={item._id} className={`card ${!item.is_available ? 'opacity-60' : ''}`}>
-            <div className="flex items-start gap-3 mb-3">
-              {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-14 h-14 rounded-md object-cover flex-shrink-0" />}
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className={item.isVeg ? 'badge-veg' : 'badge-nonveg'} />
-                  <h3 className="text-on-surface text-sm font-semibold truncate">{item.name}</h3>
-                </div>
-                <p className="text-primary text-sm font-medium">₹{item.price}</p>
+      {/* Items grouped by category */}
+      {(() => {
+        const DISPLAY_ORDER = ['pizzas', 'panuozzos', 'panzerotto', 'bites', 'fried', 'salads', 'dips', 'desserts', 'gelatos', 'coffee', 'beer_wine', 'beverages', 'soft_drinks', 'sides'];
+        // Collect any categories not in the known order so they still show
+        const allCats = [...new Set(items.map(i => i.category))];
+        const orderedCats = [
+          ...DISPLAY_ORDER.filter(c => allCats.includes(c)),
+          ...allCats.filter(c => !DISPLAY_ORDER.includes(c)),
+        ];
+        return orderedCats.map(cat => {
+          const catItems = items.filter(i => i.category === cat);
+          if (!catItems.length) return null;
+          return (
+            <div key={cat} className="mb-8">
+              <div className="flex items-center gap-3 mb-3">
+                <h2 className="text-[#FF9E18] font-heading font-bold text-sm uppercase tracking-[0.12em]">
+                  {CATEGORY_LABELS[cat] || cat}
+                </h2>
+                <span className="text-[#463022] text-xs">({catItems.length})</span>
+                <div className="flex-1 border-t border-[#2e1b0e]" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {catItems.map(item => (
+                  <div key={item._id} className={`card ${!item.is_available ? 'opacity-60' : ''}`}>
+                    <div className="flex items-start gap-3 mb-3">
+                      {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-14 h-14 rounded-md object-cover flex-shrink-0" />}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className={item.isVeg ? 'badge-veg' : 'badge-nonveg'} />
+                          <h3 className="text-on-surface text-sm font-semibold truncate">{item.name}</h3>
+                        </div>
+                        <p className="text-primary text-sm font-medium">₹{item.price}</p>
+                      </div>
+                    </div>
+
+                    {confirmDeleteId === item._id ? (
+                      <div className="bg-red-900/20 border border-red-700/40 rounded-[2px] p-3 flex items-center justify-between gap-2">
+                        <span className="text-red-400 text-xs font-medium">Remove "{item.name}"?</span>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => confirmDelete(item)}
+                            disabled={deleting}
+                            className="bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-red-500 disabled:opacity-50"
+                          >
+                            {deleting ? '...' : 'Confirm'}
+                          </button>
+                          <button
+                            onClick={() => setConfirmDeleteId(null)}
+                            className="text-[#a0815a] text-[10px] px-2 py-1.5 hover:text-[#ffdbc7]"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <button
+                          onClick={() => toggleAvailability(item)}
+                          className={`text-xs px-3 py-1 rounded-sm font-medium ${item.is_available ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-error'}`}
+                        >
+                          {item.is_available ? 'In Stock' : 'Out of Stock'}
+                        </button>
+                        <div className="flex gap-2">
+                          <button onClick={() => openEdit(item)} className="text-muted hover:text-on-surface transition-colors">
+                            <span className="material-symbols-outlined text-lg">edit</span>
+                          </button>
+                          <button onClick={() => initiateDelete(item)} className="text-muted hover:text-error transition-colors">
+                            <span className="material-symbols-outlined text-lg">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
+          );
+        });
+      })()}
 
-            {/* Inline delete confirm UI */}
-            {confirmDeleteId === item._id ? (
-              <div className="bg-red-900/20 border border-red-700/40 rounded-[2px] p-3 flex items-center justify-between gap-2">
-                <span className="text-red-400 text-xs font-medium">Remove "{item.name}"?</span>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => confirmDelete(item)}
-                    disabled={deleting}
-                    className="bg-red-600 text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-[2px] hover:bg-red-500 disabled:opacity-50"
-                  >
-                    {deleting ? '...' : 'Confirm'}
-                  </button>
-                  <button
-                    onClick={() => setConfirmDeleteId(null)}
-                    className="text-[#a0815a] text-[10px] px-2 py-1.5 hover:text-[#ffdbc7]"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <button
-                  onClick={() => toggleAvailability(item)}
-                  className={`text-xs px-3 py-1 rounded-sm font-medium ${item.is_available ? 'bg-green-900/30 text-green-400' : 'bg-red-900/30 text-error'}`}
-                >
-                  {item.is_available ? 'In Stock' : 'Out of Stock'}
-                </button>
-                <div className="flex gap-2">
-                  <button onClick={() => openEdit(item)} className="text-muted hover:text-on-surface transition-colors">
-                    <span className="material-symbols-outlined text-lg">edit</span>
-                  </button>
-                  <button onClick={() => initiateDelete(item)} className="text-muted hover:text-error transition-colors">
-                    <span className="material-symbols-outlined text-lg">delete</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
