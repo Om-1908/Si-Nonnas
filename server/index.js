@@ -20,7 +20,7 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
-  'https://si-nonnas.vercel.app/',
+  'http://localhost:5173',
   'http://localhost:3000',
   process.env.CLIENT_URL,  // e.g. https://sinnonnas.vercel.app
 ].filter(Boolean);

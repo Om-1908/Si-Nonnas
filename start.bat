@@ -82,3 +82,33 @@ echo.
 call npm run dev
 
 pause
+echo  [OK] All dependencies installed.
+echo.
+
+:: Seed database (optional - only if first run)
+echo [3/4] Database seed check...
+echo  [*] To seed/re-seed the database, run: npm run seed
+echo.
+
+:: Start both servers
+echo [4/4] Starting servers...
+echo.
+echo  Backend:  http://localhost:5000/api
+echo  Frontend: http://localhost:5173
+echo  Kitchen:  http://localhost:5173/kitchen
+echo  Manager:  http://localhost:5173/manager
+echo.
+echo  Test Logins:
+echo    Customer: customer@test.com / test123
+echo    Kitchen:  kitchen@test.com  / test123
+echo    Manager:  manager@test.com  / test123
+echo.
+echo  ============================================
+echo   Press Ctrl+C to stop all servers
+echo  ============================================
+echo.
+
+:: Run both servers concurrently
+call npm run dev
+
+pause

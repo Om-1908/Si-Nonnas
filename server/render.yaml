@@ -2,16 +2,29 @@ services:
   - type: web
     name: sinnonnas-api
     env: node
+    rootDir: server
     buildCommand: npm install
     startCommand: node index.js
     envVars:
       - key: MONGO_URI
-        sync: false
+        value: mongodb+srv://bhamareom:password69@sinonnas.gqungnj.mongodb.net/sinnonnas?retryWrites=true&w=majority&appName=Sinonnas
       - key: JWT_SECRET
         sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
       - key: CLIENT_URL
-        sync: false
+        value: https://sinonnasfc.in
       - key: EMAIL_USER
         sync: false
       - key: EMAIL_PASS
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
         sync: false
