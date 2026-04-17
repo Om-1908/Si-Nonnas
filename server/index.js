@@ -20,10 +20,15 @@ const app = express();
 const server = http.createServer(app);
 
 const allowedOrigins = [
+  'https://sinonnasfc.in',
+  'https://www.sinonnasfc.in',
+  'https://si-nonnas.vercel.app',
   'http://localhost:5173',
   'http://localhost:3000',
-  process.env.CLIENT_URL,  // e.g. https://sinnonnas.vercel.app
+  process.env.CLIENT_URL,
 ].filter(Boolean);
+
+
 
 // Socket.io setup
 const io = new Server(server, {
@@ -44,6 +49,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
