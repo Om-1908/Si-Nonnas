@@ -1,0 +1,81 @@
+name: Render Keepalive Monitor
+
+on:
+  schedule:
+    # GitHub Actions scheduler minimum is 5 minutes.
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: render-keepalive-monitor
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    env:
+      MONITOR_WEBHOOK_URL: ${{ secrets.MONITOR_WEBHOOK_URL }}
+      TARGET_URL: https://si-nonnas.onrender.com
+      TOTAL_PINGS: "9"
+      SLEEP_SECONDS: "30"
+      EXPECTED_STATUS: "200"
+      MIN_SUCCESS: "1"
+
+    steps:
+      - name: Ping Render endpoint every 30 seconds
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          success_count=0
+          failure_count=0
+
+          echo "Starting keepalive checks for: ${TARGET_URL}"
+          echo "Total pings: ${TOTAL_PINGS}, interval: ${SLEEP_SECONDS}s"
+
+          for i in $(seq 1 "${TOTAL_PINGS}"); do
+            timestamp=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+            http_code=$(curl -LfsS \
+              --max-time 20 \
+              --connect-timeout 10 \
+              --retry 2 \
+              --retry-delay 2 \
+              --retry-connrefused \
+              -o /dev/null \
+              -w "%{http_code}" \
+              "${TARGET_URL}" || true)
+
+            if [ "${http_code}" = "${EXPECTED_STATUS}" ]; then
+              success_count=$((success_count + 1))
+              echo "[${timestamp}] ping ${i}/${TOTAL_PINGS}: UP status=${http_code}"
+            else
+              failure_count=$((failure_count + 1))
+              echo "[${timestamp}] ping ${i}/${TOTAL_PINGS}: DOWN status=${http_code:-none}"
+            fi
+
+            if [ "${i}" -lt "${TOTAL_PINGS}" ]; then
+              sleep "${SLEEP_SECONDS}"
+            fi
+          done
+
+          echo "Summary: success=${success_count}, failure=${failure_count}"
+
+          # Notify only when service is effectively down (no successful response).
+          if [ "${success_count}" -lt "${MIN_SUCCESS}" ]; then
+            echo "::error::Service DOWN: no successful responses in this run."
+            exit 1
+          fi
+
+      - name: Optional webhook notification (only when down)
+        if: failure() && env.MONITOR_WEBHOOK_URL != ''
+        shell: bash
+        env:
+          TARGET_URL: https://si-nonnas.onrender.com
+        run: |
+          set -euo pipefail
+          payload=$(printf '{"text":"ALERT: Render service is DOWN - %s"}' "${TARGET_URL}")
+          curl -X POST -H "Content-Type: application/json" -d "${payload}" "${MONITOR_WEBHOOK_URL}"
