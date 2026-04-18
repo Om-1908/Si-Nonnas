@@ -19,7 +19,7 @@ jobs:
     timeout-minutes: 6
     env:
       MONITOR_WEBHOOK_URL: ${{ secrets.MONITOR_WEBHOOK_URL }}
-      TARGET_URL: https://si-nonnas.onrender.com
+      TARGET_URL: https://si-nonnas.onrender.com/api/health
       TOTAL_PINGS: "9"
       SLEEP_SECONDS: "30"
       EXPECTED_STATUS: "200"
@@ -74,7 +74,7 @@ jobs:
         if: failure() && env.MONITOR_WEBHOOK_URL != ''
         shell: bash
         env:
-          TARGET_URL: https://si-nonnas.onrender.com
+          TARGET_URL: https://si-nonnas.onrender.com/api/health
         run: |
           set -euo pipefail
           payload=$(printf '{"text":"ALERT: Render service is DOWN - %s"}' "${TARGET_URL}")
