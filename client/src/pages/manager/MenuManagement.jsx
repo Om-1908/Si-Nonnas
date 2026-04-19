@@ -8,7 +8,7 @@ export default function MenuManagement() {
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editItem, setEditItem] = useState(null);
-  const [form, setForm] = useState({ name: '', description: '', price: '', category: 'pizzas', isVeg: false, imageUrl: '' });
+  const [form, setForm] = useState({ name: '', description: '', price: '', category: 'pizzas', isVeg: false, imageUrl: '', isSignature: false });
   // Inline confirm state: stores the _id of the item pending delete confirmation
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
@@ -20,7 +20,7 @@ export default function MenuManagement() {
   });
 
   const resetForm = () => {
-    setForm({ name: '', description: '', price: '', category: 'pizzas', isVeg: false, imageUrl: '' });
+    setForm({ name: '', description: '', price: '', category: 'pizzas', isVeg: false, imageUrl: '', isSignature: false });
     setEditItem(null);
     setShowForm(false);
   };
@@ -71,7 +71,7 @@ export default function MenuManagement() {
   };
 
   const openEdit = (item) => {
-    setForm({ name: item.name, description: item.description, price: item.price, category: item.category, isVeg: item.isVeg, imageUrl: item.imageUrl || '' });
+    setForm({ name: item.name, description: item.description, price: item.price, category: item.category, isVeg: item.isVeg, imageUrl: item.imageUrl || '', isSignature: item.isSignature || false });
     setEditItem(item);
     setShowForm(true);
   };
@@ -102,6 +102,10 @@ export default function MenuManagement() {
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.isVeg} onChange={e => setForm({ ...form, isVeg: e.target.checked })} className="rounded border-outline-variant" />
               <span className="text-on-surface text-sm">Vegetarian</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" checked={form.isSignature} onChange={e => setForm({ ...form, isSignature: e.target.checked })} className="rounded border-outline-variant" />
+              <span className="text-on-surface text-sm">Signature Item (Show on Homepage)</span>
             </label>
           </div>
           <div className="flex gap-3">
@@ -138,9 +142,10 @@ export default function MenuManagement() {
                     <div className="flex items-start gap-3 mb-3">
                       {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="w-14 h-14 rounded-md object-cover flex-shrink-0" />}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1.5 flex-wrap">
                           <span className={item.isVeg ? 'badge-veg' : 'badge-nonveg'} />
                           <h3 className="text-on-surface text-sm font-semibold truncate">{item.name}</h3>
+                          {item.isSignature && <span className="ml-1 text-[9px] bg-[#FF9E18]/20 text-[#FF9E18] px-1.5 py-0.5 rounded-[2px] uppercase">Signature</span>}
                         </div>
                         <p className="text-primary text-sm font-medium">₹{item.price}</p>
                       </div>
