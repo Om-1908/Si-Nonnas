@@ -38,7 +38,7 @@ exports.createOrder = async (req, res) => {
 // GET /api/orders — all orders with filters (manager). Default: last 30 days, newest first.
 exports.getOrders = async (req, res) => {
   try {
-    const { status, paymentStatus, from, to, limit = 50, sort = 'recent' } = req.query;
+    const { status, paymentStatus, from, to, limit = 500, sort = 'recent' } = req.query;
     const filter = {};
 
     if (status) {

@@ -34,7 +34,7 @@ export default function OrderOverview() {
   const [refreshing, setRefreshing] = useState(false);
 
   const fetchOrders = (params = {}) => {
-    const qs = new URLSearchParams(params).toString();
+    const qs = new URLSearchParams({ limit: 300, ...params }).toString();
     api.get(`/orders?${qs}`)
       .then(r => setOrders(r.data))
       .catch(() => setOrders(mockOrders));
