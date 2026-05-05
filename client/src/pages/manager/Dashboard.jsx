@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import api from '../../lib/axios';
-import { mockAnalyticsSummary, mockOrders, mockReviews } from '../../lib/mockData';
 import { showToast } from '../../components/Toast';
 
 export default function Dashboard() {
-  const [summary, setSummary] = useState(mockAnalyticsSummary);
+  const [summary, setSummary] = useState({ todayRevenue: 0, activeOrders: 0, pendingReservations: 0 });
   const [activeOrders, setActiveOrders] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [replyId, setReplyId] = useState(null);
@@ -14,32 +13,32 @@ export default function Dashboard() {
 
   useEffect(() => {
     api.get('/analytics/summary').then(r => setSummary(r.data)).catch(() => {});
-    api.get('/orders?status=new,preparing,ready&limit=6')
+    api.get('/orders?status=new,preparing,ready&paymentStatus=paid,cash-confirmed,upi-confirmed&limit=6')
       .then(r => setActiveOrders(r.data))
-      .catch(() => setActiveOrders(mockOrders.slice(0, 3)));
+      .catch(() => setActiveOrders([]));
     api.get('/reviews?limit=3')
       .then(r => setReviews(r.data))
-      .catch(() => setReviews(mockReviews));
+      .catch(() => setReviews([]));
   }, []);
 
   const kpis = [
     {
       label: "Today's Revenue",
-      value: `₹${(summary.todayRevenue || 142500).toLocaleString('en-IN')}`,
-      change: '+16%',
-      positive: true,
+      value: `₹${(summary.todayRevenue || 0).toLocaleString('en-IN')}`,
+      change: summary.revenueChange || '',
+      positive: summary.revenueChange ? summary.revenueChange.startsWith('+') : true,
       key: 'revenue',
     },
     {
       label: 'Active Orders',
-      value: summary.activeOrders || 12,
-      sub: 'Full Haus',
+      value: summary.activeOrders || 0,
+      sub: '',
       key: 'orders',
     },
     {
       label: 'Pending Reservations',
-      value: summary.pendingReservations || 8,
-      sub: 'Dinner Service',
+      value: summary.pendingReservations || 0,
+      sub: '',
       key: 'reservations',
     },
   ];

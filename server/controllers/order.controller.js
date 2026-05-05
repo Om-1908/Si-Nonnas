@@ -177,9 +177,11 @@ exports.updatePaymentStatus = async (req, res) => {
     if (io) {
       if (paymentStatus === 'cash-confirmed') {
         io.to(`order-${req.params.id}`).emit('payment-cash-confirmed', { orderId: req.params.id });
+        io.to('kitchen').emit('payment-cash-confirmed', { orderId: req.params.id });
       }
       if (paymentStatus === 'upi-confirmed') {
         io.to(`order-${req.params.id}`).emit('payment-upi-confirmed', { orderId: req.params.id });
+        io.to('kitchen').emit('payment-upi-confirmed', { orderId: req.params.id });
       }
       if (paymentStatus === 'payment-cancelled') {
         io.emit('order-cancelled', { orderId: req.params.id });

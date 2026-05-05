@@ -7,7 +7,7 @@ exports.getSummary = async (req, res) => {
     todayStart.setHours(0, 0, 0, 0);
 
     const todayOrders = await Order.find({ createdAt: { $gte: todayStart } });
-    const activeOrders = await Order.countDocuments({ status: { $in: ['new', 'preparing', 'ready'] } });
+    const activeOrders = await Order.countDocuments({ status: { $in: ['new', 'preparing', 'ready'] }, paymentStatus: { $in: ['paid', 'cash-confirmed', 'upi-confirmed'] } });
     const completedToday = todayOrders.filter(o => o.status === 'complete' || o.paymentStatus === 'paid');
     const todayRevenue = completedToday.reduce((sum, o) => sum + o.total, 0);
     const avgOrderValue = completedToday.length > 0 ? todayRevenue / completedToday.length : 0;
